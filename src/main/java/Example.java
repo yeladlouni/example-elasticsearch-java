@@ -1,7 +1,10 @@
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.elasticsearch.action.index.IndexRequest;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Example {
     public static void indexTweets() {
@@ -19,23 +22,30 @@ public class Example {
 
             Reader in = new FileReader("data/covid19_tweets.csv");
             Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(in);
-            for (CSVRecord record : records) {
-                String userName = record.get(0);
-                String userLocation = record.get(1);
-                String userDescription = record.get(2);
-                String userCreated = record.get(3);
-                String userFollowers = record.get(4);
-                String userFriends = record.get(5);
-                String userFavourites = record.get(6);
-                boolean isVerified = Boolean.parseBoolean(record.get(7));
-                String date = record.get(8);
-                String text = record.get(9);
-                String hashtags = record.get(10);
-                String source = record.get(11);
-                boolean isRetweet = Boolean.parseBoolean(record.get(12));
+            int i = 0;
 
-                System.out.println(userFollowers);
-                
+            for (CSVRecord record : records) {
+
+
+                Map<String, Object> jsonMap = new HashMap<>();
+                jsonMap.put("userName", record.get(0));
+                jsonMap.put("userLocation", record.get(1));
+
+                jsonMap.put("userDescription", record.get(2));
+                jsonMap.put("userCreated", record.get(3));
+                jsonMap.put("userFollowers", record.get(4));
+                jsonMap.put("userFriends", record.get(5));
+                jsonMap.put("userFavourites", record.get(6));
+                jsonMap.put("isVerified", Boolean.parseBoolean(record.get(7)));
+                jsonMap.put("date", record.get(8));
+                jsonMap.put("text", record.get(9));
+                jsonMap.put("hashtags", record.get(10));
+                jsonMap.put("source", record.get(11));
+                jsonMap.put("isRetweet", Boolean.parseBoolean(record.get(12)));
+
+                IndexRequest indexRequest = new IndexRequest("covid").id(i + "").source(jsonMap);
+
+                i++;
             }
         } catch (IOException e) {
             e.printStackTrace();
